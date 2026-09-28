@@ -1,0 +1,292 @@
+{
+  "info": {
+    "name": "devTinder API",
+    "description": "Collection for testing devTinder endpoints: signup, login, profile, feed, connection requests, chat, payments.\n\nAuth is cookie-based (JWT stored in an httpOnly cookie named `token`). Postman's cookie jar handles this automatically as long as requests are sent to the same `baseUrl` and 'Automatically follow redirects' / cookie handling is enabled (default).\n\nSuggested flow:\n1. Run 'Signup User1' and 'Signup User2' (or 'Login User1' / 'Login User2' if they already exist) - this sets the `token` cookie for whichever user you logged in last.\n2. Run 'Get Feed' while logged in as User1 to find User2's `_id`, then set the `targetUserId` collection variable to it.\n3. Run 'Send Request - Interested' as User1 targeting User2.\n4. Log in as User2 ('Login User2'), run 'Get Received Requests' to find the request's `_id`, set `requestId` variable, then run 'Review Request - Accept'.\n\nNote: Postman keeps one cookie jar per domain, so switching between User1 and User2 means re-running the Login request for whichever user you want to act as right before the next call.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:7777", "type": "string" },
+    { "key": "targetUserId", "value": "", "type": "string" },
+    { "key": "requestId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup User1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"user1\",\n  \"lastName\": \"surname\",\n  \"emailId\": \"user1@example.com\",\n  \"password\": \"User1@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["signup"]
+            }
+          }
+        },
+        {
+          "name": "Signup User2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"user2\",\n  \"lastName\": \"surname\",\n  \"emailId\": \"user2@example.com\",\n  \"password\": \"User2@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["signup"]
+            }
+          }
+        },
+        {
+          "name": "Login User1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailId\": \"user1@example.com\",\n  \"password\": \"User1@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "Login User2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailId\": \"user2@example.com\",\n  \"password\": \"User2@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "View Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/profile/view",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "view"]
+            }
+          }
+        },
+        {
+          "name": "Edit Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"about\": \"Full-stack developer who loves hiking.\",\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"skills\": [\"Node.js\", \"React\", \"MongoDB\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile/edit",
+              "host": ["{{baseUrl}}"],
+              "path": ["profile", "edit"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feed & Connections",
+      "item": [
+        {
+          "name": "Get Feed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/feed?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["feed"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Connections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/connections",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "connections"]
+            }
+          }
+        },
+        {
+          "name": "Get Received Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/requests/received",
+              "host": ["{{baseUrl}}"],
+              "path": ["user", "requests", "received"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Connection Requests",
+      "item": [
+        {
+          "name": "Send Request - Interested",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/request/send/interested/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["request", "send", "interested", "{{targetUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Send Request - Ignored",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/request/send/ignored/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["request", "send", "ignored", "{{targetUserId}}"]
+            }
+          }
+        },
+        {
+          "name": "Review Request - Accept",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/request/review/accepted/{{requestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["request", "review", "accepted", "{{requestId}}"]
+            }
+          }
+        },
+        {
+          "name": "Review Request - Reject",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/request/review/rejected/{{requestId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["request", "review", "rejected", "{{requestId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Get or Create Chat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/chat/{{targetUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "{{targetUserId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Create Order (silver)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipType\": \"silver\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "create"]
+            }
+          }
+        },
+        {
+          "name": "Create Order (gold)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"membershipType\": \"gold\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "create"]
+            }
+          }
+        },
+        {
+          "name": "Verify Premium",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/premium/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["premium", "verify"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
