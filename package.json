@@ -1,7 +1,7 @@
 {
-  "name": "devtinder",
+  "name": "now-connect",
   "version": "1.0.0",
-  "description": "tinder for devs",
+  "description": "Now Connect — an internal social-networking backend (auth, connection graph, feed, chat, payments), being scaled up with Redis, BullMQ, and S3-compatible object storage.",
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
@@ -14,17 +14,23 @@
   "author": "Akshay Saini",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1142.0",
     "@aws-sdk/client-ses": "^3.716.0",
+    "@aws-sdk/s3-request-presigner": "^3.1142.0",
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
+    "bullmq": "^6.3.9",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.19.2",
+    "ioredis": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.1",
     "node-cron": "^3.0.3",
     "razorpay": "^2.9.5",
+    "redis": "^6.2.1",
     "socket.io": "^4.8.1",
     "validator": "^13.12.0"
   }
