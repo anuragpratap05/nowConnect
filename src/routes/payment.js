@@ -3,11 +3,11 @@ const { userAuth } = require("../middlewares/auth");
 const paymentRouter = express.Router();
 const razorpayInstance = require("../utils/razorpay");
 const Payment = require("../models/payment");
-const User = require("../models/user");
 const { membershipAmount } = require("../utils/constants");
 const {
   validateWebhookSignature,
 } = require("razorpay/dist/utils/razorpay-utils");
+const { addPaymentJob } = require("../queues/paymentQueue");
 
 paymentRouter.post("/payment/create", userAuth, async (req, res) => {
   try {
@@ -50,9 +50,7 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
 
 paymentRouter.post("/payment/webhook", async (req, res) => {
   try {
-    console.log("Webhook Called");
     const webhookSignature = req.get("X-Razorpay-Signature");
-    console.log("Webhook Signature", webhookSignature);
 
     const isWebhookValid = validateWebhookSignature(
       JSON.stringify(req.body),
@@ -61,36 +59,29 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
     );
 
     if (!isWebhookValid) {
-      console.log("INvalid Webhook Signature");
       return res.status(400).json({ msg: "Webhook signature is invalid" });
     }
-    console.log("Valid Webhook Signature");
 
-    // Udpate my payment Status in DB
-    const paymentDetails = req.body.payload.payment.entity;
+    // Razorpay sends a unique id per event; used as the queue jobId so a
+    // redelivered webhook is de-duplicated by the queue (idempotency).
+    const eventId = req.get("X-Razorpay-Event-Id");
+    const event = req.body.event;
+    const paymentEntity = req.body?.payload?.payment?.entity;
 
-    const payment = await Payment.findOne({ orderId: paymentDetails.order_id });
-    payment.status = paymentDetails.status;
-    await payment.save();
-    console.log("Payment saved");
+    if (!paymentEntity?.order_id) {
+      // Not a payment event we handle (e.g. a refund/subscription event). Ack so
+      // Razorpay stops retrying, but do nothing.
+      return res.status(200).json({ msg: "Ignored: not a payment event" });
+    }
 
-    const user = await User.findOne({ _id: payment.userId });
-    user.isPremium = true;
-    user.membershipType = payment.notes.membershipType;
-    console.log("User saved");
+    // Once the signature is verified, ACK IMMEDIATELY and do the DB work off the
+    // request path (src/workers/paymentWorker.js). This is what lets us absorb a
+    // burst of webhook calls without Razorpay's delivery backing up. The DB
+    // update (payment status + user upgrade) and event-type branching all happen
+    // in the worker; here we only enqueue.
+    await addPaymentJob(eventId, { event, paymentEntity });
 
-    await user.save();
-
-    // Update the user as premium
-
-    // if (req.body.event == "payment.captured") {
-    // }
-    // if (req.body.event == "payment.failed") {
-    // }
-
-    // return success response to razorpay
-
-    return res.status(200).json({ msg: "Webhook received successfully" });
+    return res.status(200).json({ msg: "Webhook received" });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }

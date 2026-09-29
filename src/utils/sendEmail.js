@@ -31,9 +31,18 @@ const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
 };
 
 const run = async (subject, body, toEmailId) => {
+  // Previously the recipient was hardcoded and `toEmailId` was ignored, so every
+  // email went to the same inbox regardless of who the notification was for.
+  // The worker enqueues one job per recipient, so this must honour toEmailId.
+  if (!toEmailId) {
+    throw new Error("sendEmail.run: toEmailId is required");
+  }
+
+  const fromAddress = process.env.SES_FROM_ADDRESS || "akshay@devtinder.in";
+
   const sendEmailCommand = createSendEmailCommand(
-    "akshaysaini.in@gmail.com",
-    "akshay@devtinder.in",
+    toEmailId,
+    fromAddress,
     subject,
     body
   );
