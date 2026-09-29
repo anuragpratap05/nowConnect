@@ -1,0 +1,42 @@
+# Local infra for Now Connect.
+#
+# Brings up the two new backing services introduced in Phase 0:
+#   - redis: used by BullMQ (Phase 1), the rate limiter (Phase 2), and the
+#            Socket.io adapter (Phase 3).
+#   - minio: S3-compatible object storage for post images (Phase 4).
+#
+# MongoDB is intentionally NOT here — it stays on its existing local install
+# or Atlas cluster, unchanged.
+#
+# Usage:
+#   docker compose up -d          # start redis + minio in the background
+#   docker compose down           # stop them (data persists in named volumes)
+#   MinIO console: http://localhost:9001  (login with the root creds below)
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: nowconnect-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: nowconnect-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  minio-data:
