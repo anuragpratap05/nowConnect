@@ -400,6 +400,26 @@ Short, per-dependency, and the point is that each answer is *different*:
 
 ---
 
+## If asked "how did you test it?"
+
+"Two layers. The query plans I measured in a throwaway database at eight thousand
+documents, so the before/after numbers are real rather than asserted — and that's
+also how I caught that a partially-applicable index was buying nothing.
+
+The behaviour I drove through the actual app in a browser, against the real
+worker and the real object store, because that's the only way to prove the thing
+this design is actually claiming. The network log shows the upload URL request
+hitting my API, then the bytes going to the object store's port, then the claim
+hitting my API again — the image never crosses the backend, and you can see that
+rather than take my word for it.
+
+It also caught a bug I'd never have found from a screenshot: the shared footer is
+position-fixed, so it was sitting on top of the 'load more' button and eating the
+clicks. The button was visible — it just wasn't clickable. That's the kind of
+thing that only shows up if you actually drive the page."
+
+---
+
 ## Bugs and gaps found along the way (good if asked "what else did you find?")
 
 1. **A user-facing screen had been doing a full collection scan since it was

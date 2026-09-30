@@ -817,6 +817,54 @@ names:  user1, Virat, Barack
 Same response shape as before the refactor; 3 queries became 2, and the edge
 query went from a COLLSCAN to a covered index read.
 
+### End-to-end through the real React app
+
+The claim this whole phase rests on is "image bytes never touch the API". A
+screenshot cannot show that; the network log can. Uploading a canvas-generated
+JPEG through the real UI, logged in as Elon:
+
+```
+POST http://localhost:7777/posts/upload-url                        -> 200   (API, small JSON)
+PUT  http://localhost:9000/now-connect-posts/posts/<uid>/325ba…jpg -> 200   <- THE BYTES
+POST http://localhost:7777/posts                                   -> 201   (API, small JSON)
+GET  http://localhost:9000/now-connect-posts/posts/<uid>/325ba…jpg -> 200   (original renders)
+GET  http://localhost:7777/posts/feed?limit=5                      -> 200   (thumbnail poll)
+GET  http://localhost:9000/now-connect-posts/thumbs/<uid>/325ba…webp -> 200 <- worker done
+```
+
+The bytes go to **:9000**, the object store. The API on **:7777** sees two small
+JSON requests and never the image. The final request also confirms the derived
+key: `thumbs/<uid>/325ba….webp` shares its basename with
+`posts/<uid>/325ba….jpg`, which is what makes a retried thumbnail job overwrite
+rather than orphan.
+
+CORS worked without configuration: the browser sent an `OPTIONS` preflight to
+MinIO, got `204`, then the `PUT`. That only works because the upload request
+does **not** carry credentials — S3 and MinIO answer preflights with a wildcard
+origin, and a browser refuses a wildcard on a credentialed request. The client
+uses a separate bare axios instance for the object store for exactly this
+reason.
+
+Also verified in the browser:
+
+| | |
+|---|---|
+| Likes | `♡ 0` → `♥ 1` → `♡ 0`, optimistic then reconciled from the response |
+| Cursor paging | 5 posts, then 9 after "Load more"; button disappears at the end; one `?cursor=` request, no duplicates |
+| Thumbnail swap | post rendered from the original on creation, replaced by the `.webp` a second later |
+| Owner-only delete | the Delete button renders on Elon's own post and on none of Virat's |
+| **Authorization** | logged in as Narendra (no accepted connections): **"No posts yet"** while 9 posts exist |
+
+That last row is the connection graph holding through the real client, not just
+through curl.
+
+**One bug found this way, which is the argument for doing it:** the app-wide
+footer is `fixed bottom-0`, so it painted over the bottom of the page and
+swallowed clicks on "Load more posts" — `elementFromPoint` at the button's centre
+returned the footer. It is invisible in a screenshot, because the button *is*
+visible; it simply isn't clickable. Fixed with bottom padding on the posts page
+rather than by un-fixing the shared footer.
+
 ### Cleanup
 
 The bench database was dropped. The deliberately-corrupt test post and the
@@ -858,9 +906,14 @@ their 16 objects (8 originals + 8 thumbnails) for the frontend verification.
 
 ### Frontend (`nowConnect-web`, separate repo)
 
-See that repo's Phase 4 PR. The client is what proves the central claim of this
-phase — that the image bytes go straight from the browser to object storage and
-never through the API.
+| File | What |
+|---|---|
+| `src/utils/postApi.js` *(added)* | The three-step upload. A **separate bare axios instance** for the object store, so the session cookie is never sent cross-origin (and so the credentialed-wildcard CORS failure can't happen); `Content-Type` threaded from one `file.type` read through both calls, since it is now signed; `displayUrl()` centralising the `thumbnailUrl ?? imageUrl` contract |
+| `src/components/Posts.jsx` *(added)* | Upload form with real progress (real because the browser is doing the transfer), cursor-paginated feed, optimistic likes reconciled from the response, owner-only delete, bounded thumbnail poll |
+| `src/App.jsx`, `src/components/NavBar.jsx` *(changed)* | `/posts` route and nav link |
+
+The client is what proves the central claim of this phase — see "End-to-end
+through the real React app" above.
 
 ---
 
