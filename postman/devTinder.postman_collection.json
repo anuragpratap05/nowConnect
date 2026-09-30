@@ -5,11 +5,46 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:7777", "type": "string" },
-    { "key": "targetUserId", "value": "", "type": "string" },
-    { "key": "requestId", "value": "", "type": "string" },
-    { "key": "messageCursor", "value": "", "type": "string" },
-    { "key": "unconnectedUserId", "value": "", "type": "string" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7777",
+      "type": "string"
+    },
+    {
+      "key": "targetUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageCursor",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "unconnectedUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "postImageKey",
+      "value": "",
+      "description": "The `key` returned by POST /posts/upload-url"
+    },
+    {
+      "key": "postId",
+      "value": "",
+      "description": "A post _id from GET /posts/feed"
+    },
+    {
+      "key": "postCursor",
+      "value": "",
+      "description": "nextCursor from a previous GET /posts/feed"
+    }
   ],
   "item": [
     {
@@ -19,15 +54,24 @@
           "name": "Signup User1",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"user1\",\n  \"lastName\": \"surname\",\n  \"emailId\": \"user1@example.com\",\n  \"password\": \"User1@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/signup",
-              "host": ["{{baseUrl}}"],
-              "path": ["signup"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "signup"
+              ]
             }
           }
         },
@@ -35,15 +79,24 @@
           "name": "Signup User2",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"user2\",\n  \"lastName\": \"surname\",\n  \"emailId\": \"user2@example.com\",\n  \"password\": \"User2@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/signup",
-              "host": ["{{baseUrl}}"],
-              "path": ["signup"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "signup"
+              ]
             }
           }
         },
@@ -51,15 +104,24 @@
           "name": "Login User1",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"emailId\": \"user1@example.com\",\n  \"password\": \"User1@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
             }
           }
         },
@@ -67,15 +129,24 @@
           "name": "Login User2",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"emailId\": \"user2@example.com\",\n  \"password\": \"User2@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
             }
           }
         },
@@ -86,8 +157,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["logout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "logout"
+              ]
             }
           }
         }
@@ -103,8 +178,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/profile/view",
-              "host": ["{{baseUrl}}"],
-              "path": ["profile", "view"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile",
+                "view"
+              ]
             }
           }
         },
@@ -112,15 +192,25 @@
           "name": "Edit Profile",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"about\": \"Full-stack developer who loves hiking.\",\n  \"age\": 25,\n  \"gender\": \"male\",\n  \"skills\": [\"Node.js\", \"React\", \"MongoDB\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/profile/edit",
-              "host": ["{{baseUrl}}"],
-              "path": ["profile", "edit"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile",
+                "edit"
+              ]
             }
           }
         }
@@ -136,11 +226,24 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/feed?limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["feed"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "feed"
+              ],
               "query": [
-                { "key": "limit", "value": "10", "description": "1-50, capped server-side at 50." },
-                { "key": "cursor", "value": "", "disabled": true, "description": "Phase 2 cursor pagination: paste nextCursor from the previous response to get the following page. Omit for page 1. `page` is no longer supported - skip/limit made deep pages cost linearly more (docs/phase-2.md)." }
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "1-50, capped server-side at 50."
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Phase 2 cursor pagination: paste nextCursor from the previous response to get the following page. Omit for page 1. `page` is no longer supported - skip/limit made deep pages cost linearly more (docs/phase-2.md)."
+                }
               ]
             }
           }
@@ -152,8 +255,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/user/connections",
-              "host": ["{{baseUrl}}"],
-              "path": ["user", "connections"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "connections"
+              ]
             }
           }
         },
@@ -164,8 +272,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/user/requests/received",
-              "host": ["{{baseUrl}}"],
-              "path": ["user", "requests", "received"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "requests",
+                "received"
+              ]
             }
           }
         }
@@ -181,8 +295,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/request/send/interested/{{targetUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["request", "send", "interested", "{{targetUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "request",
+                "send",
+                "interested",
+                "{{targetUserId}}"
+              ]
             }
           }
         },
@@ -193,8 +314,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/request/send/ignored/{{targetUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["request", "send", "ignored", "{{targetUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "request",
+                "send",
+                "ignored",
+                "{{targetUserId}}"
+              ]
             }
           }
         },
@@ -205,8 +333,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/request/review/accepted/{{requestId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["request", "review", "accepted", "{{requestId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "request",
+                "review",
+                "accepted",
+                "{{requestId}}"
+              ]
             }
           }
         },
@@ -217,8 +352,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/request/review/rejected/{{requestId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["request", "review", "rejected", "{{requestId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "request",
+                "review",
+                "rejected",
+                "{{requestId}}"
+              ]
             }
           }
         }
@@ -235,10 +377,19 @@
             "description": "Phase 3. Returns ONE PAGE of history: { chatId, data, nextCursor, hasMore }. `data` is oldest-first so it renders top-to-bottom as-is. Requires an ACCEPTED connection with the target user. Read-only: a pair who has never spoken gets an empty page and no Chat document is created (the old version created one on GET).",
             "url": {
               "raw": "{{baseUrl}}/chat/{{targetUserId}}?limit=50",
-              "host": ["{{baseUrl}}"],
-              "path": ["chat", "{{targetUserId}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chat",
+                "{{targetUserId}}"
+              ],
               "query": [
-                { "key": "limit", "value": "50", "description": "1-100, default 50" }
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "1-100, default 50"
+                }
               ]
             }
           }
@@ -251,11 +402,24 @@
             "description": "Scroll further back. Paste the previous response's `nextCursor` into the `messageCursor` variable. Cursor paging costs the same at any depth (keysExamined stays at `limit`), unlike skip/limit which re-walks every skipped document.",
             "url": {
               "raw": "{{baseUrl}}/chat/{{targetUserId}}?limit=50&before={{messageCursor}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["chat", "{{targetUserId}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chat",
+                "{{targetUserId}}"
+              ],
               "query": [
-                { "key": "limit", "value": "50", "description": "1-100, default 50" },
-                { "key": "before", "value": "{{messageCursor}}", "description": "nextCursor from the previous page" }
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "1-100, default 50"
+                },
+                {
+                  "key": "before",
+                  "value": "{{messageCursor}}",
+                  "description": "nextCursor from the previous page"
+                }
               ]
             }
           }
@@ -265,11 +429,16 @@
           "request": {
             "method": "GET",
             "header": [],
-            "description": "Authorization check added in Phase 3 — any logged-in user could previously read any pair's conversation. Expect 403.",
+            "description": "Authorization check added in Phase 3 \u2014 any logged-in user could previously read any pair's conversation. Expect 403.",
             "url": {
               "raw": "{{baseUrl}}/chat/{{unconnectedUserId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["chat", "{{unconnectedUserId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "chat",
+                "{{unconnectedUserId}}"
+              ]
             }
           }
         }
@@ -282,15 +451,25 @@
           "name": "Create Order (silver)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"membershipType\": \"silver\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/payment/create",
-              "host": ["{{baseUrl}}"],
-              "path": ["payment", "create"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "create"
+              ]
             }
           }
         },
@@ -298,15 +477,25 @@
           "name": "Create Order (gold)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"membershipType\": \"gold\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/payment/create",
-              "host": ["{{baseUrl}}"],
-              "path": ["payment", "create"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "create"
+              ]
             }
           }
         },
@@ -317,8 +506,253 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/premium/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["premium", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "premium",
+                "verify"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "1. Get Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Phase 4, STEP 1 of 3. Returns { key, url, expiresIn, maxBytes }. The `url` is a presigned PUT that the CLIENT uploads to directly \u2014 image bytes never pass through the API.\n\nThe key is built from the authenticated user's id (`posts/<userId>/<random>.jpg`), never from anything in the body, which is what makes the prefix an ownership boundary.\n\ncontentType must be one of image/jpeg, image/png, image/webp. An allowlist, not /^image\\//: that pattern would accept image/svg+xml, and an SVG can carry <script>.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contentType\": \"image/jpeg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts/upload-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "upload-url"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Upload the file (do this in a shell, not Postman)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "description": "Phase 4, STEP 2 of 3 \u2014 NOT an API call. The client PUTs the bytes straight to object storage using the presigned URL from step 1:\n\n  curl -X PUT \"<url from step 1>\" \\\n       -H 'Content-Type: image/jpeg' \\\n       --data-binary @photo.jpg\n\nThe Content-Type header MUST match what you asked for in step 1 \u2014 it is part of the signature (`X-Amz-SignedHeaders=content-type;host`), so a mismatch is refused with 403 SignatureDoesNotMatch.\n\nNote what a presigned PUT CANNOT do: cap the object size. A 24.7MB upload against a URL issued under a 5MB policy returns 200. That is enforced at claim time instead (step 3).",
+            "url": {
+              "raw": "{{baseUrl}}/posts/upload-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "upload-url"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Create Post (claim the upload)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "description": "Phase 4, STEP 3 of 3. Turns an uploaded object into a Post.\n\nChecks, in order:\n- imageKey must start with `posts/<your own userId>/` -> else 403. Without this a user could claim ANY key in the bucket, including someone else's private photo.\n- HeadObject (metadata only, no bytes) confirms the object exists -> else 400, and that it is within 5MB -> else 413 AND the object is deleted, so this endpoint can't be used as free unlimited storage.\n\nIdempotent: imageKey is uniquely indexed, so retrying the same claim returns 200 with the EXISTING post rather than creating a duplicate.\n\nthumbnailUrl is null in the response \u2014 the thumbnail is generated asynchronously by a BullMQ worker (`npm run worker`). Clients render `thumbnailUrl ?? imageUrl`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"imageKey\": \"{{postImageKey}}\",\n  \"caption\": \"Shipped Phase 4 \\ud83d\\ude80\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Posts Feed (first page)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Phase 4. Cursor-paginated, scoped to the requester's ACCEPTED connections plus their own posts. Returns { data, nextCursor, hasMore }.\n\nFan-out on READ: the timeline is computed at query time from the connection graph, not materialised per user. Safe here because a mutual-connection graph bounds the fan-out to hundreds \u2014 see docs/phase-4.md for where that breaks (the celebrity problem) and what the hybrid answer is.\n\nEach post carries likeCount and likedByMe. likedByMe for the whole page is ONE $in query, not one per post \u2014 the N+1 that would otherwise make a 10-post page 10 extra round trips.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "feed"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "1-30, default 10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Posts Feed (older page, cursor)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Phase 4. Pages BACKWARDS into the past: `_id < cursor`, descending \u2014 the same convention as chat history and for the same reason (_id is unique, so no post can be dropped or repeated at a page boundary; createdAt is millisecond-precision and NOT unique, so it can).\n\nMeasured against .skip(): at page 40 of a 50k-post collection, cursor examined 37 keys vs skip's 520.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed?cursor={{postCursor}}&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "feed"
+              ],
+              "query": [
+                {
+                  "key": "cursor",
+                  "value": "{{postCursor}}",
+                  "description": "nextCursor from the previous page"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get a User's Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Phase 4. One author's posts, for a profile page. Authorized through the SAME connection graph as the feed, so a profile view cannot be a way to read posts the feed would have hidden. 403 if you are not connected.\n\nUses the pairwise connectionGuard (a single unique-index point lookup) rather than materialising the whole connection list to search it.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/user/{{targetUserId}}?limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "user",
+                "{{targetUserId}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get a User's Posts (403 - not a connection)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Phase 4. Expect 403. Post ids and user ids are handed out freely in feed and connections responses, so 'paste an id you already have' is the actual attack this closes \u2014 the same class of hole Phase 3 closed on chat.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/user/{{unconnectedUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "user",
+                "{{unconnectedUserId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Like Post (idempotent)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "description": "Phase 4. No 'have they already liked it?' check anywhere in the handler \u2014 the unique {postId, userId} index is the authority. First call 201 'Post liked'; every repeat 200 'Already liked' with the true current count.\n\nThat is what makes a double-tapped heart safe. Verified with 8 simultaneous requests: one 201, seven 200s, final likeCount exactly 1. A findOne-then-insert would have let two of them both pass the check.\n\nlikeCount is maintained with $inc (atomic server-side), never read-modify-write, which would lose updates under concurrency. It is only incremented when the Like insert actually succeeded, so a retry cannot inflate it.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/like",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{postId}}",
+                "like"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unlike Post (idempotent)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Phase 4. Deleting zero rows is reported as 200 'Not liked', not 404 \u2014 the caller's intended end state already holds.\n\nDeliberately has NO connection check, unlike the like route: unliking only removes a row you created yourself, and gating it would strand the row and leave the counter permanently inflated if you were disconnected in between. Authorize the action that creates state, not the one that withdraws your own.\n\nThe $inc is guarded on likeCount > 0 so the counter can never go negative.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}/like",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{postId}}",
+                "like"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Post (author only)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "description": "Phase 4. Ownership is enforced in the QUERY (`findOneAndDelete({_id, userId})`), not as a separate check followed by a delete \u2014 one round trip, and no window for the post to change hands in between. A non-owner gets the same 404 as a missing post, which also avoids confirming that an id exists.\n\nAlso deletes the post's Like rows and BOTH objects (original + thumbnail) from storage. The object deletes are best-effort and last: the post is already gone from the user's perspective, so failing to delete two objects must not produce an error for an operation that succeeded.",
+            "url": {
+              "raw": "{{baseUrl}}/posts/{{postId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "posts",
+                "{{postId}}"
+              ]
             }
           }
         }
