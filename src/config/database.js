@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const connectDB = async () => {
-  console.log(process.env.DB_CONNECTION_SECRET);
+  // Never log the connection string — it carries credentials in any non-local environment.
   await mongoose.connect(process.env.DB_CONNECTION_SECRET);
 };
 

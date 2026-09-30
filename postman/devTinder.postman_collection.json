@@ -133,12 +133,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/feed?page=1&limit=10",
+              "raw": "{{baseUrl}}/feed?limit=10",
               "host": ["{{baseUrl}}"],
               "path": ["feed"],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" }
+                { "key": "limit", "value": "10", "description": "1-50, capped server-side at 50." },
+                { "key": "cursor", "value": "", "disabled": true, "description": "Phase 2 cursor pagination: paste nextCursor from the previous response to get the following page. Omit for page 1. `page` is no longer supported - skip/limit made deep pages cost linearly more (docs/phase-2.md)." }
               ]
             }
           }
