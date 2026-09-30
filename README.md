@@ -65,6 +65,24 @@ MINIO_ROOT_USER=minioadmin MINIO_ROOT_PASSWORD=minioadmin \
   minio server ~/minio-data --console-address ":9001"   # MinIO on :9000 / :9001
 ```
 
+## Data migrations
+
+One-shot scripts, run by an operator rather than at boot — they touch user data
+and can partially fail in ways a human should look at. Both are idempotent, so a
+re-run (or a re-run after an interruption) is safe.
+
+```bash
+node src/scripts/backfillRequestPairs.js   # Phase 2: canonical pair on ConnectionRequest
+npm run migrate:chat -- --dry-run          # Phase 3: preview, writes nothing
+npm run migrate:chat                       # Phase 3: embedded Chat.messages[] -> Message collection
+```
+
+`migrate:chat` is required before Phase 3 code serves any pre-existing chat data:
+`Chat` no longer declares the embedded `messages` array, so history that hasn't
+been moved into the `Message` collection will not be read. It copies messages
+before unsetting the array, so an interruption leaves duplicate data (which the
+re-run skips) rather than missing data.
+
 ## API reference
 
 See [`apiList.md`](apiList.md).
