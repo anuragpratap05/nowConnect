@@ -23,7 +23,7 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
 // const paymentRouter = require("./routes/payment");
-// const initializeSocket = require("./utils/socket");
+const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
 
 app.use("/", authRouter);
@@ -34,7 +34,12 @@ app.use("/", userRouter);
 app.use("/", chatRouter);
 
 const server = http.createServer(app);
-// initializeSocket(server);
+
+// Phase 3: re-enabled. Socket.io attaches to the same http server as Express, so
+// there is one process and one port serving both the REST API and the WebSocket
+// upgrade. Rooms are backed by the Redis adapter (see src/utils/socket.js), which
+// is what makes running more than one of these processes actually work.
+initializeSocket(server);
 
 connectDB()
   .then(() => {

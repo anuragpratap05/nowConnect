@@ -7,7 +7,8 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "worker": "node src/workers/index.js",
-    "worker:dev": "nodemon src/workers/index.js"
+    "worker:dev": "nodemon src/workers/index.js",
+    "migrate:chat": "node src/scripts/migrateChatMessages.js"
   },
   "keywords": [
     "nodejs",
@@ -22,6 +23,7 @@
     "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^6.3.9",
+    "cookie": "^0.6.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",

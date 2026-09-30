@@ -7,7 +7,9 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:7777", "type": "string" },
     { "key": "targetUserId", "value": "", "type": "string" },
-    { "key": "requestId", "value": "", "type": "string" }
+    { "key": "requestId", "value": "", "type": "string" },
+    { "key": "messageCursor", "value": "", "type": "string" },
+    { "key": "unconnectedUserId", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -226,14 +228,48 @@
       "name": "Chat",
       "item": [
         {
-          "name": "Get or Create Chat",
+          "name": "Get Chat History (first page)",
           "request": {
             "method": "GET",
             "header": [],
+            "description": "Phase 3. Returns ONE PAGE of history: { chatId, data, nextCursor, hasMore }. `data` is oldest-first so it renders top-to-bottom as-is. Requires an ACCEPTED connection with the target user. Read-only: a pair who has never spoken gets an empty page and no Chat document is created (the old version created one on GET).",
             "url": {
-              "raw": "{{baseUrl}}/chat/{{targetUserId}}",
+              "raw": "{{baseUrl}}/chat/{{targetUserId}}?limit=50",
               "host": ["{{baseUrl}}"],
-              "path": ["chat", "{{targetUserId}}"]
+              "path": ["chat", "{{targetUserId}}"],
+              "query": [
+                { "key": "limit", "value": "50", "description": "1-100, default 50" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Chat History (older page, cursor)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Scroll further back. Paste the previous response's `nextCursor` into the `messageCursor` variable. Cursor paging costs the same at any depth (keysExamined stays at `limit`), unlike skip/limit which re-walks every skipped document.",
+            "url": {
+              "raw": "{{baseUrl}}/chat/{{targetUserId}}?limit=50&before={{messageCursor}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "{{targetUserId}}"],
+              "query": [
+                { "key": "limit", "value": "50", "description": "1-100, default 50" },
+                { "key": "before", "value": "{{messageCursor}}", "description": "nextCursor from the previous page" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Chat History (403 - not a connection)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Authorization check added in Phase 3 — any logged-in user could previously read any pair's conversation. Expect 403.",
+            "url": {
+              "raw": "{{baseUrl}}/chat/{{unconnectedUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["chat", "{{unconnectedUserId}}"]
             }
           }
         }
