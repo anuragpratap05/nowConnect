@@ -6,6 +6,11 @@ end-to-end and is now being **scaled up phase by phase** — each phase adds a
 feature area that maps to a specific, defensible senior-level interview talking
 point (a design decision, a trade-off, a failure mode and its fix).
 
+**New here? Start with [`docs/architecture.md`](docs/architecture.md)** — the
+single cross-phase overview of how the system actually fits together (process
+model, auth, the connection graph, the four user-facing flows, the index table,
+and the known gaps).
+
 See [`project_enhancement_plan.md`](project_enhancement_plan.md) for the full
 plan and [`docs/`](docs) for the per-phase write-ups.
 
