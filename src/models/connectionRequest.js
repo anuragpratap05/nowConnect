@@ -90,6 +90,52 @@ connectionRequestSchema.index(
   }
 );
 
+// Phase 4: index the "my connections" access pattern — in BOTH directions.
+//
+// Found while building the posts feed, which needs "the ids of everyone I am
+// accepted-connected to" on every feed page. That list comes from
+// src/utils/connectionGraph.js, and the query behind it is the same $or that
+// GET /user/connections has always run:
+//
+//     {$or: [{fromUserId: me, status: "accepted"},
+//            {toUserId:   me, status: "accepted"}]}
+//
+// Before these two indexes, `.explain()` on that query returned
+// SUBPLAN -> COLLSCAN with totalKeysExamined: 0 — a full scan of
+// ConnectionRequest, the fastest-growing collection in the system. This is the
+// SECOND independent collection scan found on this collection (Phase 1 fixed the
+// 8am cron's), and this one is worse in one specific way: the cron ran once a day
+// off the request path, while this runs on a user-facing route, synchronously,
+// every time anyone opens their connections list.
+//
+// Why it scanned even though {fromUserId, toUserId} exists and could serve the
+// first branch: MongoDB's $or subplanner needs an indexed plan for EVERY branch.
+// If even one branch has no usable index it abandons index selection for the
+// whole $or and scans once, which is cheaper than scanning once per branch. So a
+// half-indexed $or performs exactly like an unindexed one — there is no partial
+// credit. That is the non-obvious part, and it is why the fix has to be two
+// indexes, not one.
+//
+// Key order {<pairField>, status, <otherPairField>} is chosen so the queries are
+// COVERED. Both pair fields are equality predicates, `status` is equality too,
+// and the trailing field is the only other one connectionGraph.js projects — so
+// with {_id: 0} MongoDB answers entirely from index keys and never fetches a
+// document (totalDocsExamined: 0). Same covered-query technique as the Phase 1
+// cron fix, applied to a read path instead of a batch job.
+//
+// These also incidentally fix GET /user/requests/received, which queries
+// {toUserId: me, status: "interested"} and was scanning for the same reason.
+//
+// Note on the {fromUserId, toUserId} index above: Phase 2 removed the only query
+// that used it (the check-then-act findOne, replaced by the canonical-pair unique
+// index), so it is now dead weight — it costs a write on every insert and serves
+// no read. It is deliberately left in place rather than dropped in this phase:
+// dropping an index is an irreversible-in-production operation that wants its own
+// change and its own verification that nothing regressed, not a drive-by deletion
+// inside a feature branch.
+connectionRequestSchema.index({ fromUserId: 1, status: 1, toUserId: 1 });
+connectionRequestSchema.index({ toUserId: 1, status: 1, fromUserId: 1 });
+
 // Derive the canonical pair before validation, so the `required` rules above
 // see the computed values. Sorting the two ids as hex strings is a stable total
 // order, so (A,B) and (B,A) both yield low=A, high=B.

@@ -7,6 +7,7 @@ const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 const feedCache = require("../utils/feedCache");
+const { getAcceptedConnectionIds } = require("../utils/connectionGraph");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
@@ -30,25 +31,42 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   }
 });
 
+// Phase 4 refactor. Same response shape, three changes underneath:
+//
+//   1. The $or that used to live here now lives in src/utils/connectionGraph.js,
+//      shared with the posts feed. It was the only other place that knew a
+//      connection is stored directionally and has to be read both ways; having
+//      two copies of that rule was a latent divergence.
+//   2. It is no longer a COLLSCAN. Phase 4 added the two indexes that let the $or
+//      be served from indexes at all (see src/models/connectionRequest.js for why
+//      a half-indexed $or scans anyway) — this route has been scanning
+//      ConnectionRequest on every call since it was written.
+//   3. Two .populate() calls became one User.find(). Each populate is its own
+//      round trip that resolves an $in against User, so the old version was
+//      3 queries (edges + populate from + populate to) against 2 now, and the
+//      edge query is index-covered where it used to fetch every document.
+//
+// Ordering note: results now come back in User._id order rather than in
+// ConnectionRequest insertion order. No client depends on connection ordering
+// (the UI renders an unordered card list), and neither ordering was meaningful —
+// the old one was "whoever swiped first, earliest", which is not a property
+// anyone asked to sort by.
 userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
-    const connectionRequests = await ConnectionRequest.find({
-      $or: [
-        { toUserId: loggedInUser._id, status: "accepted" },
-        { fromUserId: loggedInUser._id, status: "accepted" },
-      ],
-    })
-      .populate("fromUserId", USER_SAFE_DATA)
-      .populate("toUserId", USER_SAFE_DATA);
+    const connectionIds = await getAcceptedConnectionIds(loggedInUser._id);
 
-    const data = connectionRequests.map((row) => {
-      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
-        return row.toUserId;
-      }
-      return row.fromUserId;
-    });
+    // Short-circuit: $in with an empty array is a valid query that matches
+    // nothing, so this is purely about not making the round trip at all for a
+    // brand-new account with no connections yet.
+    if (connectionIds.length === 0) {
+      return res.json({ data: [] });
+    }
+
+    const data = await User.find({ _id: { $in: connectionIds } }).select(
+      USER_SAFE_DATA
+    );
 
     res.json({ data });
   } catch (err) {

@@ -15,7 +15,8 @@ plan and [`docs/`](docs) for the per-phase write-ups.
 - **MongoDB / Mongoose** — primary datastore (`src/models/`)
 - **Socket.io** — real-time chat (`src/utils/socket.js`)
 - **Redis** — BullMQ job queue, rate limiting, Socket.io adapter _(added Phase 0)_
-- **MinIO / S3** — object storage for post images _(added Phase 0)_
+- **sharp** — thumbnail generation on a background worker _(added Phase 4)_
+- **MinIO / S3** — object storage for post images, via presigned uploads _(Phase 0, used in Phase 4)_
 - **Razorpay + AWS SES** — payments and transactional email
 
 ## Getting started
@@ -83,6 +84,47 @@ been moved into the `Message` collection will not be read. It copies messages
 before unsetting the array, so an interruption leaves duplicate data (which the
 re-run skips) rather than missing data.
 
+## Posts: the upload flow (Phase 4)
+
+Image bytes never pass through the Node process. Creating a post is three calls,
+two of which carry no payload:
+
+```
+1. POST /posts/upload-url  { contentType }   ->  { key, url, expiresIn, maxBytes }
+2. PUT  <url>              <the image>       ->  client uploads DIRECTLY to S3/MinIO
+3. POST /posts             { imageKey, caption }  ->  the Post row  (the "claim")
+```
+
+Step 2 does not touch the API at all. The backend's involvement is two small JSON
+requests, so an upload costs the same regardless of image size — see
+[`src/utils/postStorage.js`](src/utils/postStorage.js) for the full reasoning and
+the limitations of presigned `PUT`.
+
+A thumbnail is generated **asynchronously** by a BullMQ worker, so `thumbnailUrl`
+is `null` for the first moment of a post's life. Clients render
+`thumbnailUrl ?? imageUrl`; that fallback is what makes a backed-up or crashed
+thumbnail worker degrade image weight rather than availability.
+
+Read URLs are short-lived presigned GETs, so **the bucket stays private** and
+post visibility is enforced in one place (the connection graph) rather than two.
+
+| Route | |
+|-------|-|
+| `POST /posts/upload-url` | mint a presigned PUT URL |
+| `POST /posts` | claim an uploaded object as a post |
+| `GET /posts/feed?cursor=&limit=` | cursor-paginated, scoped to accepted connections |
+| `GET /posts/user/:userId?cursor=&limit=` | one author's posts (same authorization rule) |
+| `POST /posts/:postId/like` | idempotent like |
+| `DELETE /posts/:postId/like` | idempotent unlike |
+| `DELETE /posts/:postId` | author only; removes likes and both objects |
+
+Run the worker alongside the API, or thumbnails are never generated:
+
+```bash
+npm run worker        # email + payment + thumbnail workers
+npm run worker:dev    # same, under nodemon
+```
+
 ## API reference
 
 See [`apiList.md`](apiList.md).
@@ -94,6 +136,6 @@ See [`apiList.md`](apiList.md).
 | 0 | Shared infra: Docker Compose (Redis + MinIO), config clients, env, deps ✅ |
 | 1 | Async processing (BullMQ) + a real cron/index incident story |
 | 2 | Membership-tier rate limiting + cursor-based feed pagination |
-| 3 | Chat at scale: separate `Message` collection + Socket.io Redis adapter |
-| 4 | Posts with images via pre-signed S3 uploads |
+| 3 | Chat at scale: separate `Message` collection + Socket.io Redis adapter ✅ |
+| 4 | Posts with images via pre-signed S3 uploads + async thumbnails ✅ |
 | 5 | Future scaling roadmap (write-up only) |
