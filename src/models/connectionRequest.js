@@ -122,10 +122,21 @@ connectionRequestSchema.index(
 // with {_id: 0} MongoDB answers entirely from index keys and never fetches a
 // document (totalDocsExamined: 0). Same covered-query technique as the Phase 1
 // cron fix, applied to a read path instead of a batch job.
+
+
+// This also tightens GET /user/requests/received, which queries
+// {toUserId: me, status: "interested"}. It was never a COLLSCAN — the Phase 1
+// partial index {status, createdAt, toUserId} already served it — but createdAt
+// sits between status and toUserId in that key order, so the walk had to pass
+// over every OTHER user's interested requests before filtering by toUserId.
+// Measured at 8,000 docs: keysExamined 89 -> 42, exactly equal to nReturned.
 //
-// These also incidentally fix GET /user/requests/received, which queries
-// {toUserId: me, status: "interested"} and was scanning for the same reason.
-//
+// It does NOT become a covered query, and can't: the route needs the
+// ConnectionRequest's own _id (the Accept/Reject buttons send it straight to
+// POST /request/review/:status/:requestId), and _id isn't part of this index.
+// It also calls .populate("fromUserId", ...), a second round-trip to User
+// regardless of whether this read is covered.
+
 // Note on the {fromUserId, toUserId} index above: Phase 2 removed the only query
 // that used it (the check-then-act findOne, replaced by the canonical-pair unique
 // index), so it is now dead weight — it costs a write on every insert and serves
